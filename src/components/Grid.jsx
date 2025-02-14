@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState , useMemo} from "react";
+import GridCell from "./GridCell";
 
 export default function Grid(){
-    const gridBox = Array(20).fill(null).map(()=>Array(20).fill(0));
+    const gridBox = useMemo(()=>Array(20).fill(null).map(()=>Array(20).fill(0)),[]);
     const[start, setStart]= useState(null);
     const[end, setEnd]= useState(null);
     const[visited, setVisited]= useState(new Set());
@@ -24,11 +25,16 @@ export default function Grid(){
 
     }
 
-    const handleClick = (rowIndex, columnIndex)=>{
-                if(!start) setStart([rowIndex, columnIndex])
-                else if(!end) setEnd([rowIndex,columnIndex])
+    const handleClick =useCallback((rowIndex, columnIndex)=>{
+                if(!start) {
+                  setStart([rowIndex,columnIndex])
+                }
+                else if(!end) {
+                  setEnd([rowIndex,columnIndex])
+                }
               
-    }
+    },[start,end]);
+   
     useEffect(()=>{
         if(start&& end){
             const newSet = new Set();
@@ -46,11 +52,7 @@ export default function Grid(){
                 const isEnd = end && end[0]==rowIndex && end[1]==columnIndex
                 const isVisited =visited.has(`${rowIndex}-${columnIndex}`)
                 return(
-                    <div style={{border:'2px solid black', height:'20px', width:'20px', 
-                        backgroundColor:`${isStart?'green':isEnd?'red':isVisited?'blue':'white'}`
-                    }} onClick={()=>handleClick(rowIndex, columnIndex)} key={`${rowIndex}-${columnIndex}`}>
-                        
-                        </div>
+                   <GridCell isStart={isStart} isEnd={isEnd} isVisited={isVisited} rowIndex={rowIndex} columnIndex={columnIndex} handleClick={handleClick} key={`${rowIndex}-${columnIndex}`}></GridCell>
                 )
               })
             )}
